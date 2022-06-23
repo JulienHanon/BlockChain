@@ -17,9 +17,11 @@ class App extends Component {
     console.log("contract : ", weddingPartner)
     const Certificate = await weddingPartner.methods.getListCertificate().call() //we fetch the address of the contract with the function getListCertificate
     this.setState({ Certificate }) // update the getListCertificate value with the one we just fetch 
+    let LastCertificateCreated = Certificate.length - 1 // set the position of the last certificate created to display 
+    this.setState({LastCertificateCreated})
   }
 
-  constructor(props) {
+  constructor(props) { // initiate our variable with the constructor
     super(props)
     this.state = {
       account: '',
@@ -38,7 +40,7 @@ class App extends Component {
         <input type="text" id="partner2" placeholder="Nom Partenaire 2"></input>
       </div>
       <button>Valider</button>
-      <h1>Certificat de Mariage : {this.state.Certificate}</h1>
+      <h1>Certificat de Mariage : {this.state.Certificate[this.state.LastCertificateCreated]}</h1> 
      
     </div>
     );
