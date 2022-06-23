@@ -1,57 +1,48 @@
-import { useEffect, useState } from 'react';
+import React, { Component } from 'react'
 import Web3 from "web3/dist/web3.min.js";
-import { LIST_WEDDING_ABI, LIST_WEDDING_ADDRESS } from './config';
+import { WEDDING_ABI, WEDDING_ADDRESS } from './config';
 import './App.css';
 
-function App() {
-  const[account, setAccount] = useState(); // state variable to set account
-  const [weddingList, setWeddingList] = useState();
-  const [weddings, setWeddings] = useState([]);
+class App extends Component {
+  componentWillMount() {
+    this.load()
+  }
 
-  useEffect(()=>{
-    async function load() {
-      const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
-      const accounts = await web3.eth.requestAccounts();
-      setAccount(accounts[0]);
+  async load() {
+    const web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
+    const accounts = await web3.eth.getAccounts()
+    this.setState({ account: accounts[0] })
+    const weddingPartner = new web3.eth.Contract(WEDDING_ABI, WEDDING_ADDRESS)// instantiate the smart contract
+    this.setState({ weddingPartner})
+    console.log("contract : ", weddingPartner)
+    const Certificate = await weddingPartner.methods.getListCertificate().call() //we fetch the address of the contract with the function getListCertificate
+    this.setState({ Certificate }) // update the getListCertificate value with the one we just fetch 
+  }
 
-      const weddingList = new web3.eth.Contract(LIST_WEDDING_ABI, LIST_WEDDING_ADDRESS);
-      
-      setWeddingList(weddingList);
-
-      const counter = await weddingList.methods.count().call();
-      
-      for (var i = 1; i <= counter; i++) {
-        
-        const wedding = await weddingList.methods.weddings(i).call();
-        
-        setWeddings((weddings) => [...weddings, wedding]);
-      }
+  constructor(props) {
+    super(props)
+    this.state = {
+      account: '',
+      Certificate: '',
     }
-    load();
 
-  }, []);
+  }
 
-  return (
-    <div className='App'>
-      Your account is : {account}
+  render() {
+    return (
+      <div className='App'>
+      Your account is : {this.state.account}
       <h1>Creer un certificat de Mariage : </h1>
       <div>
-        <input type="text" placeholder="Nom Partenaire 1"></input>
-        <input type="text" placeholder="Nom Partenaire 2"></input>
+        <input type="text" id="partner1" placeholder="Nom Partenaire 1"></input>
+        <input type="text" id="partner2" placeholder="Nom Partenaire 2"></input>
       </div>
       <button>Valider</button>
-      <h1>Certificat de Mariage : </h1>
-      <ul>
-      {
-        Object.keys(weddings).map((wedding, index) => (
-          <li key={`${weddings[index].name}-${index}`}>
-            <h4>{weddings[index].name}</h4>
-          </li>
-        ))
-      }
-      </ul>
+      <h1>Certificat de Mariage : {this.state.Certificate}</h1>
+     
     </div>
-  );
+    );
+  }
 }
 
 export default App;
