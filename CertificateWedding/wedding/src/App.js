@@ -18,8 +18,7 @@ class App extends Component {
     this.setState({ weddingPartner})
     const Certificate = await weddingList.methods.getListCertificate().call() //we fetch the address of the contract with the function getListCertificate
     this.setState({ Certificate }) // update the Certificate value with the one we just fetch 
-    const Partner = await weddingPartner.methods.getPartners().call()//we fetch the name of the Partners witht the function getPartners()
-    this.setState({Partner}) // update the Partner value with the one we juste fetch 
+  
     let LastCertificateCreated = Certificate.length - 1 // set the position of the last certificate created to display 
     this.setState({LastCertificateCreated})
     this.setState({ loading: false })
@@ -32,12 +31,11 @@ class App extends Component {
       account: '',
       Certificate: '',
       Partner: 'Name ',
-      loading : true
     }
 
   }
   createCertificate() {
-    this.setState({ loading: true })
+    
     let partner1 = document.getElementById("partner1").value
     let partner2 = document.getElementById("partner2").value
     if ((partner1 && partner2) === ''){ // if one of the input display an error message
@@ -45,9 +43,6 @@ class App extends Component {
     }else{
       document.getElementById("errorMsg").style.display = "none"; 
       this.state.weddingList.methods.createCertificate(partner1, partner2).send({from:this.state.account})//execute the function createCertificate that will create a new contract
-      .once('receipt', (receipt) => {
-        this.setState({ loading: false })
-      })
     }
  
   }
@@ -67,23 +62,10 @@ class App extends Component {
       <p id="errorMsg" className='errorMsg'>Veuillez remplir les deux champs !</p>
       <h1>Certificat de Mariage : </h1> 
       <h2>{this.state.Certificate[this.state.LastCertificateCreated]}</h2>  
-      <div>
-        <h2>Rentrez l'adresse de votre contrat de mariage : </h2>
-        <input type="text" placeholder='Addresse contract'></input>
-        <button onClick={() => {this.DisplayPartners()}}>Valider</button>
-        <p>{this.state.Partner}</p>
-      </div>
     </div>
     );
   }
+  
 }
-//rajouter un chargement le temps de la transaction
-// ajouter un input pour afficher le nom des partenaires 
-/*
- 	<div>
-        <h2>Rentrez l'adresse de votre contrat de mariage : </h2>
-        <input type="text" placeholder='Addresse contract'></input>
-      </div>
-*/
 
 export default App;
